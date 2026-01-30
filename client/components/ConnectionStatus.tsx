@@ -68,14 +68,14 @@ export function ConnectionStatus({ state, deviceName, onReconnect }: ConnectionS
         };
       case "error":
         return {
-          icon: "bluetooth-off" as const,
+          icon: "x-circle" as const,
           color: BeachColors.error,
           text: "Connection failed",
           showReconnect: true,
         };
       default:
         return {
-          icon: "bluetooth-off" as const,
+          icon: "bluetooth" as const,
           color: BeachColors.textSecondary,
           text: "Not connected",
           showReconnect: true,

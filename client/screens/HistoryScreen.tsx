@@ -1,16 +1,16 @@
-import React, { useEffect, useState, useCallback } from "react";
-import { StyleSheet, View, FlatList, Image, Pressable, Alert } from "react-native";
+import React from "react";
+import { StyleSheet, View, FlatList, Image } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useHeaderHeight } from "@react-navigation/elements";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { Feather } from "@expo/vector-icons";
-import * as Haptics from "expo-haptics";
+import { useQuery } from "@tanstack/react-query";
 
 import { ThemedText } from "@/components/ThemedText";
 import { GradientBackground } from "@/components/GradientBackground";
-import { getMessages, clearMessages, SentMessage } from "@/lib/storage";
 import { BeachColors, Spacing, BorderRadius, Shadows } from "@/constants/theme";
+import type { Message } from "@shared/schema";
 
-function formatTimestamp(timestamp: number): string {
+function formatTimestamp(timestamp: Date | string): string {
   const date = new Date(timestamp);
   const now = new Date();
   const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
@@ -27,7 +27,7 @@ function formatTimestamp(timestamp: number): string {
 }
 
 interface MessageItemProps {
-  message: SentMessage;
+  message: Message;
 }
 
 function MessageItem({ message }: MessageItemProps) {
@@ -35,12 +35,31 @@ function MessageItem({ message }: MessageItemProps) {
     <View style={styles.messageItem}>
       <View style={styles.messageContent}>
         <ThemedText style={styles.messageText}>{message.text}</ThemedText>
-        <ThemedText style={styles.messageTime}>
-          {formatTimestamp(message.timestamp)}
-        </ThemedText>
-      </View>
-      <View style={styles.messageSentIcon}>
-        <Feather name="check-circle" size={16} color={BeachColors.success} />
+        <View style={styles.messageFooter}>
+          <ThemedText style={styles.messageTime}>
+            {formatTimestamp(message.createdAt)}
+          </ThemedText>
+          <View
+            style={[
+              styles.statusBadge,
+              message.delivered ? styles.statusDelivered : styles.statusPending,
+            ]}
+          >
+            <Feather
+              name={message.delivered ? "check-circle" : "clock"}
+              size={12}
+              color={message.delivered ? BeachColors.success : BeachColors.sunsetCoral}
+            />
+            <ThemedText
+              style={[
+                styles.statusText,
+                { color: message.delivered ? BeachColors.success : BeachColors.sunsetCoral },
+              ]}
+            >
+              {message.delivered ? "Delivered" : "Pending"}
+            </ThemedText>
+          </View>
+        </View>
       </View>
     </View>
   );
@@ -56,7 +75,7 @@ function EmptyState() {
       />
       <ThemedText style={styles.emptyTitle}>No Messages Yet</ThemedText>
       <ThemedText style={styles.emptySubtitle}>
-        Your sent messages will appear here
+        Your message history will appear here
       </ThemedText>
     </View>
   );
@@ -64,69 +83,45 @@ function EmptyState() {
 
 export default function HistoryScreen() {
   const insets = useSafeAreaInsets();
-  const headerHeight = useHeaderHeight();
-  const [messages, setMessages] = useState<SentMessage[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const tabBarHeight = useBottomTabBarHeight();
 
-  const loadMessages = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const data = await getMessages();
-      setMessages(data);
-    } catch (error) {
-      console.error("Failed to load messages:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const { data: messages = [], isLoading } = useQuery<Message[]>({
+    queryKey: ["/api/messages"],
+    refetchInterval: 10000,
+  });
 
-  useEffect(() => {
-    loadMessages();
-  }, [loadMessages]);
-
-  const handleClearHistory = useCallback(() => {
-    Alert.alert(
-      "Clear History",
-      "Are you sure you want to delete all sent messages?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Clear",
-          style: "destructive",
-          onPress: async () => {
-            await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-            await clearMessages();
-            setMessages([]);
-          },
-        },
-      ]
-    );
-  }, []);
+  const deliveredCount = messages.filter((m) => m.delivered).length;
+  const pendingCount = messages.filter((m) => !m.delivered).length;
 
   return (
     <GradientBackground>
       <FlatList
         data={messages}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => <MessageItem message={item} />}
         contentContainerStyle={[
           styles.listContent,
           {
-            paddingTop: headerHeight + Spacing.lg,
-            paddingBottom: insets.bottom + Spacing.xl,
+            paddingTop: insets.top + Spacing.xl,
+            paddingBottom: tabBarHeight + Spacing.xl,
           },
+          messages.length === 0 && styles.listContentEmpty,
         ]}
         ListEmptyComponent={!isLoading ? <EmptyState /> : null}
         ListHeaderComponent={
           messages.length > 0 ? (
             <View style={styles.headerRow}>
-              <ThemedText style={styles.headerTitle}>
-                {messages.length} message{messages.length !== 1 ? "s" : ""} sent
-              </ThemedText>
-              <Pressable onPress={handleClearHistory} style={styles.clearButton}>
-                <Feather name="trash-2" size={16} color={BeachColors.error} />
-                <ThemedText style={styles.clearText}>Clear</ThemedText>
-              </Pressable>
+              <ThemedText style={styles.headerTitle}>Message History</ThemedText>
+              <View style={styles.statsRow}>
+                <View style={styles.stat}>
+                  <Feather name="check-circle" size={14} color={BeachColors.success} />
+                  <ThemedText style={styles.statText}>{deliveredCount} delivered</ThemedText>
+                </View>
+                <View style={styles.stat}>
+                  <Feather name="clock" size={14} color={BeachColors.sunsetCoral} />
+                  <ThemedText style={styles.statText}>{pendingCount} pending</ThemedText>
+                </View>
+              </View>
             </View>
           ) : null
         }
@@ -141,26 +136,30 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.lg,
     flexGrow: 1,
   },
+  listContentEmpty: {
+    justifyContent: "center",
+  },
   headerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
     marginBottom: Spacing.lg,
+    gap: Spacing.sm,
   },
   headerTitle: {
-    fontSize: 14,
-    color: BeachColors.textSecondary,
+    fontSize: 24,
+    fontWeight: "600",
+    color: BeachColors.textPrimary,
   },
-  clearButton: {
+  statsRow: {
+    flexDirection: "row",
+    gap: Spacing.lg,
+  },
+  stat: {
     flexDirection: "row",
     alignItems: "center",
     gap: Spacing.xs,
-    paddingVertical: Spacing.xs,
-    paddingHorizontal: Spacing.sm,
   },
-  clearText: {
+  statText: {
     fontSize: 14,
-    color: BeachColors.error,
+    color: BeachColors.textSecondary,
   },
   messageItem: {
     flexDirection: "row",
@@ -172,18 +171,38 @@ const styles = StyleSheet.create({
   },
   messageContent: {
     flex: 1,
-    gap: Spacing.xs,
+    gap: Spacing.sm,
   },
   messageText: {
     fontSize: 16,
     color: BeachColors.textPrimary,
   },
+  messageFooter: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
   messageTime: {
     fontSize: 12,
     color: BeachColors.textSecondary,
   },
-  messageSentIcon: {
-    marginLeft: Spacing.md,
+  statusBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.xs,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: 2,
+    borderRadius: BorderRadius.full,
+  },
+  statusDelivered: {
+    backgroundColor: "rgba(110, 207, 160, 0.15)",
+  },
+  statusPending: {
+    backgroundColor: "rgba(242, 142, 125, 0.15)",
+  },
+  statusText: {
+    fontSize: 12,
+    fontWeight: "500",
   },
   separator: {
     height: Spacing.md,
@@ -195,9 +214,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.xl,
   },
   emptyImage: {
-    width: 200,
-    height: 200,
-    marginBottom: Spacing.xl,
+    width: 180,
+    height: 180,
+    marginBottom: Spacing.lg,
   },
   emptyTitle: {
     fontSize: 20,

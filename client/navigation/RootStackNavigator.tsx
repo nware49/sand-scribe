@@ -1,14 +1,12 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import MessageScreen from "@/screens/MessageScreen";
-import HistoryScreen from "@/screens/HistoryScreen";
+import MainTabNavigator from "@/navigation/MainTabNavigator";
 import { useScreenOptions } from "@/hooks/useScreenOptions";
 import { BeachColors } from "@/constants/theme";
 
 export type RootStackParamList = {
-  Message: undefined;
-  History: undefined;
+  Main: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -26,19 +24,9 @@ export default function RootStackNavigator() {
       }}
     >
       <Stack.Screen
-        name="Message"
-        component={MessageScreen}
-        options={{
-          headerShown: false,
-        }}
-      />
-      <Stack.Screen
-        name="History"
-        component={HistoryScreen}
-        options={{
-          headerTitle: "Recent Messages",
-          headerTintColor: BeachColors.oceanBlue,
-        }}
+        name="Main"
+        component={MainTabNavigator}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );

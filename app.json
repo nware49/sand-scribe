@@ -1,19 +1,19 @@
 {
   "expo": {
-    "name": "Beach Messages",
-    "slug": "beach-messages",
+    "name": "Sand Scribe",
+    "slug": "sand-scribe",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "beachmessages",
+    "scheme": "sandscribe",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.beachmessages.app",
+      "bundleIdentifier": "com.sandscribe.app",
       "infoPlist": {
-        "NSBluetoothAlwaysUsageDescription": "Beach Messages needs Bluetooth to connect to Helen's Display and send your messages.",
-        "NSBluetoothPeripheralUsageDescription": "Beach Messages needs Bluetooth to connect to Helen's Display and send your messages."
+        "NSBluetoothAlwaysUsageDescription": "Sand Scribe needs Bluetooth to connect to the display device and send messages.",
+        "NSBluetoothPeripheralUsageDescription": "Sand Scribe needs Bluetooth to connect to the display device and send messages."
       }
     },
     "android": {
@@ -25,7 +25,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.beachmessages.app",
+      "package": "com.sandscribe.app",
       "permissions": [
         "android.permission.BLUETOOTH",
         "android.permission.BLUETOOTH_ADMIN",

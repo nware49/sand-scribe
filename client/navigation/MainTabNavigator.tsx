@@ -3,31 +3,33 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Feather } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { Platform, StyleSheet } from "react-native";
-import HomeStackNavigator from "@/navigation/HomeStackNavigator";
-import ProfileStackNavigator from "@/navigation/ProfileStackNavigator";
-import { useTheme } from "@/hooks/useTheme";
+
+import SendScreen from "@/screens/SendScreen";
+import ReceiveScreen from "@/screens/ReceiveScreen";
+import HistoryScreen from "@/screens/HistoryScreen";
+import { BeachColors } from "@/constants/theme";
 
 export type MainTabParamList = {
-  HomeTab: undefined;
-  ProfileTab: undefined;
+  SendTab: undefined;
+  ReceiveTab: undefined;
+  HistoryTab: undefined;
 };
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 export default function MainTabNavigator() {
-  const { theme, isDark } = useTheme();
-
   return (
     <Tab.Navigator
-      initialRouteName="HomeTab"
+      initialRouteName="SendTab"
       screenOptions={{
-        tabBarActiveTintColor: theme.tabIconSelected,
-        tabBarInactiveTintColor: theme.tabIconDefault,
+        tabBarActiveTintColor: BeachColors.oceanBlue,
+        tabBarInactiveTintColor: BeachColors.textSecondary,
         tabBarStyle: {
           position: "absolute",
           backgroundColor: Platform.select({
             ios: "transparent",
-            android: theme.backgroundRoot,
+            android: BeachColors.cardSurface,
+            web: BeachColors.cardSurface,
           }),
           borderTopWidth: 0,
           elevation: 0,
@@ -36,7 +38,7 @@ export default function MainTabNavigator() {
           Platform.OS === "ios" ? (
             <BlurView
               intensity={100}
-              tint={isDark ? "dark" : "light"}
+              tint="light"
               style={StyleSheet.absoluteFill}
             />
           ) : null,
@@ -44,22 +46,32 @@ export default function MainTabNavigator() {
       }}
     >
       <Tab.Screen
-        name="HomeTab"
-        component={HomeStackNavigator}
+        name="SendTab"
+        component={SendScreen}
         options={{
-          title: "Home",
+          title: "Send",
           tabBarIcon: ({ color, size }) => (
-            <Feather name="home" size={size} color={color} />
+            <Feather name="edit-3" size={size} color={color} />
           ),
         }}
       />
       <Tab.Screen
-        name="ProfileTab"
-        component={ProfileStackNavigator}
+        name="ReceiveTab"
+        component={ReceiveScreen}
         options={{
-          title: "Profile",
+          title: "Receive",
           tabBarIcon: ({ color, size }) => (
-            <Feather name="user" size={size} color={color} />
+            <Feather name="bluetooth" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="HistoryTab"
+        component={HistoryScreen}
+        options={{
+          title: "History",
+          tabBarIcon: ({ color, size }) => (
+            <Feather name="clock" size={size} color={color} />
           ),
         }}
       />
