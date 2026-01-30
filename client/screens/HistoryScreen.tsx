@@ -34,7 +34,14 @@ function MessageItem({ message }: MessageItemProps) {
   return (
     <View style={styles.messageItem}>
       <View style={styles.messageContent}>
-        <ThemedText style={styles.messageText}>{message.text}</ThemedText>
+        {message.delivered ? (
+          <ThemedText style={styles.messageText}>{message.text}</ThemedText>
+        ) : (
+          <View style={styles.hiddenMessageRow}>
+            <Feather name="lock" size={14} color={BeachColors.textSecondary} />
+            <ThemedText style={styles.hiddenText}>Hidden until delivered</ThemedText>
+          </View>
+        )}
         <View style={styles.messageFooter}>
           <ThemedText style={styles.messageTime}>
             {formatTimestamp(message.createdAt)}
@@ -176,6 +183,16 @@ const styles = StyleSheet.create({
   messageText: {
     fontSize: 16,
     color: BeachColors.textPrimary,
+  },
+  hiddenMessageRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.sm,
+  },
+  hiddenText: {
+    fontSize: 14,
+    color: BeachColors.textSecondary,
+    fontStyle: "italic",
   },
   messageFooter: {
     flexDirection: "row",

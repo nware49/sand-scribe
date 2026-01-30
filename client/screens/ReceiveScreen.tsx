@@ -51,7 +51,10 @@ function MessageCard({ message, onDeliver, isDelivering, isConnected }: MessageC
   return (
     <Animated.View style={[styles.messageCard, animatedStyle]}>
       <View style={styles.messageContent}>
-        <ThemedText style={styles.messageText}>{message.text}</ThemedText>
+        <View style={styles.hiddenMessageRow}>
+          <Feather name="lock" size={14} color={BeachColors.textSecondary} />
+          <ThemedText style={styles.hiddenText}>Hidden until delivered</ThemedText>
+        </View>
         <ThemedText style={styles.messageTime}>
           Queued at {formatTime(message.createdAt)}
         </ThemedText>
@@ -339,6 +342,16 @@ const styles = StyleSheet.create({
   messageText: {
     fontSize: 16,
     color: BeachColors.textPrimary,
+  },
+  hiddenMessageRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.sm,
+  },
+  hiddenText: {
+    fontSize: 14,
+    color: BeachColors.textSecondary,
+    fontStyle: "italic",
   },
   messageTime: {
     fontSize: 12,
