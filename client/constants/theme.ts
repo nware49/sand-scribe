@@ -1,19 +1,40 @@
 import { Platform } from "react-native";
 
-const tintColorLight = "#007AFF";
+// Beach Messages Color Palette
+export const BeachColors = {
+  // Primary colors
+  oceanBlue: "#4A90A4",
+  sunsetCoral: "#F28E7D",
+  sandyBeige: "#F5E6D3",
+  lightOcean: "#A4D4E6",
+  foamWhite: "#FFFFFF",
+  
+  // Text colors
+  textPrimary: "#2C3E50",
+  textSecondary: "#7B8A9A",
+  
+  // Status colors
+  success: "#6ECFA0",
+  error: "#E74C3C",
+  
+  // Card surface
+  cardSurface: "rgba(255, 255, 255, 0.90)",
+};
+
+const tintColorLight = BeachColors.oceanBlue;
 const tintColorDark = "#0A84FF";
 
 export const Colors = {
   light: {
-    text: "#11181C",
+    text: BeachColors.textPrimary,
     buttonText: "#FFFFFF",
     tabIconDefault: "#687076",
     tabIconSelected: tintColorLight,
-    link: "#007AFF",
-    backgroundRoot: "#FFFFFF", // Elevation 0
-    backgroundDefault: "#F2F2F2", // Elevation 1
-    backgroundSecondary: "#E6E6E6", // Elevation 2
-    backgroundTertiary: "#D9D9D9", // Elevation 3
+    link: BeachColors.oceanBlue,
+    backgroundRoot: BeachColors.sandyBeige,
+    backgroundDefault: BeachColors.cardSurface,
+    backgroundSecondary: "#E6E6E6",
+    backgroundTertiary: "#D9D9D9",
   },
   dark: {
     text: "#ECEDEE",
@@ -21,10 +42,10 @@ export const Colors = {
     tabIconDefault: "#9BA1A6",
     tabIconSelected: tintColorDark,
     link: "#0A84FF",
-    backgroundRoot: "#1F2123", // Elevation 0
-    backgroundDefault: "#2A2C2E", // Elevation 1
-    backgroundSecondary: "#353739", // Elevation 2
-    backgroundTertiary: "#404244", // Elevation 3
+    backgroundRoot: "#1F2123",
+    backgroundDefault: "#2A2C2E",
+    backgroundSecondary: "#353739",
+    backgroundTertiary: "#404244",
   },
 };
 
@@ -39,13 +60,13 @@ export const Spacing = {
   "4xl": 40,
   "5xl": 48,
   inputHeight: 48,
-  buttonHeight: 52,
+  buttonHeight: 56,
 };
 
 export const BorderRadius = {
   xs: 8,
   sm: 12,
-  md: 18,
+  md: 16,
   lg: 24,
   xl: 30,
   "2xl": 40,
@@ -89,17 +110,42 @@ export const Typography = {
     lineHeight: 24,
     fontWeight: "400" as const,
   },
+  caption: {
+    fontSize: 12,
+    lineHeight: 16,
+    fontWeight: "400" as const,
+  },
+};
+
+export const Shadows = {
+  card: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  button: {
+    shadowColor: BeachColors.oceanBlue,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  floating: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.10,
+    shadowRadius: 4,
+    elevation: 3,
+  },
 };
 
 export const Fonts = Platform.select({
   ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
     sans: "system-ui",
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
     serif: "ui-serif",
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
     rounded: "ui-rounded",
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
     mono: "ui-monospace",
   },
   default: {
