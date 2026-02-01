@@ -137,16 +137,19 @@ const styles = StyleSheet.create({
   titleContainer: {
     alignItems: "center",
     gap: Spacing.sm,
-    marginTop: Spacing.lg,
+    marginTop: Spacing.md,
+    paddingVertical: Spacing.sm,
   },
   titleIcon: {
-    width: 60,
-    height: 60,
+    width: 56,
+    height: 56,
   },
   title: {
-    fontSize: 32,
+    fontSize: 28,
+    lineHeight: 40,
     color: BeachColors.oceanBlue,
     textAlign: "center",
+    paddingHorizontal: Spacing.md,
   },
   subtitle: {
     fontSize: 14,
