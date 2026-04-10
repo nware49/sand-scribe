@@ -3,11 +3,13 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Feather } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { Platform, StyleSheet } from "react-native";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import SendScreen from "@/screens/SendScreen";
 import ReceiveScreen from "@/screens/ReceiveScreen";
 import HistoryScreen from "@/screens/HistoryScreen";
 import { BeachColors } from "@/constants/theme";
+import { RootStackParamList, MainTabName } from "@/navigation/RootStackNavigator";
 
 export type MainTabParamList = {
   SendTab: undefined;
@@ -17,10 +19,14 @@ export type MainTabParamList = {
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
-export default function MainTabNavigator() {
+type Props = NativeStackScreenProps<RootStackParamList, "Main"> & {
+  initialTab?: MainTabName;
+};
+
+export default function MainTabNavigator({ initialTab }: Props) {
   return (
     <Tab.Navigator
-      initialRouteName="SendTab"
+      initialRouteName={initialTab ?? "SendTab"}
       screenOptions={{
         tabBarActiveTintColor: BeachColors.oceanBlue,
         tabBarInactiveTintColor: BeachColors.textSecondary,
