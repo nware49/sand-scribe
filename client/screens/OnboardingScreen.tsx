@@ -33,7 +33,10 @@ export default function OnboardingScreen({ navigation }: Props) {
     setSelecting(role);
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     await AsyncStorage.setItem(ROLE_STORAGE_KEY, role);
-    navigation.replace("Main", { initialTab: role === "helen" ? "ReceiveTab" : "SendTab" });
+    navigation.replace("Main", {
+      initialTab: role === "helen" ? "ReceiveTab" : "SendTab",
+      role,
+    });
   };
 
   return (

@@ -8,10 +8,11 @@ import { useScreenOptions } from "@/hooks/useScreenOptions";
 import { BeachColors } from "@/constants/theme";
 
 export type MainTabName = "SendTab" | "ReceiveTab" | "HistoryTab";
+export type UserRole = "helen" | "nate";
 
 export type RootStackParamList = {
   Onboarding: undefined;
-  Main: { initialTab?: MainTabName };
+  Main: { initialTab?: MainTabName; role?: UserRole };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -20,14 +21,17 @@ export default function RootStackNavigator() {
   const screenOptions = useScreenOptions();
   const [initialRoute, setInitialRoute] = useState<"Onboarding" | "Main" | null>(null);
   const [savedTab, setSavedTab] = useState<MainTabName | undefined>(undefined);
+  const [savedRole, setSavedRole] = useState<UserRole | undefined>(undefined);
 
   useEffect(() => {
     AsyncStorage.getItem(ROLE_STORAGE_KEY).then((role) => {
       if (role === "helen") {
         setSavedTab("ReceiveTab");
+        setSavedRole("helen");
         setInitialRoute("Main");
       } else if (role === "nate") {
         setSavedTab("SendTab");
+        setSavedRole("nate");
         setInitialRoute("Main");
       } else {
         setInitialRoute("Onboarding");
@@ -60,6 +64,7 @@ export default function RootStackNavigator() {
           <MainTabNavigator
             {...props}
             initialTab={props.route.params?.initialTab ?? savedTab}
+            role={props.route.params?.role ?? savedRole}
           />
         )}
       </Stack.Screen>

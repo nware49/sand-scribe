@@ -9,7 +9,7 @@ import SendScreen from "@/screens/SendScreen";
 import ReceiveScreen from "@/screens/ReceiveScreen";
 import HistoryScreen from "@/screens/HistoryScreen";
 import { BeachColors } from "@/constants/theme";
-import { RootStackParamList, MainTabName } from "@/navigation/RootStackNavigator";
+import { RootStackParamList, MainTabName, UserRole } from "@/navigation/RootStackNavigator";
 
 export type MainTabParamList = {
   SendTab: undefined;
@@ -21,9 +21,13 @@ const Tab = createBottomTabNavigator<MainTabParamList>();
 
 type Props = NativeStackScreenProps<RootStackParamList, "Main"> & {
   initialTab?: MainTabName;
+  role?: UserRole;
 };
 
-export default function MainTabNavigator({ initialTab }: Props) {
+export default function MainTabNavigator({ initialTab, role }: Props) {
+  const showSend = role !== "helen";
+  const showReceive = role !== "nate";
+
   return (
     <Tab.Navigator
       initialRouteName={initialTab ?? "SendTab"}
@@ -51,26 +55,30 @@ export default function MainTabNavigator({ initialTab }: Props) {
         headerShown: false,
       }}
     >
-      <Tab.Screen
-        name="SendTab"
-        component={SendScreen}
-        options={{
-          title: "Send",
-          tabBarIcon: ({ color, size }) => (
-            <Feather name="edit-3" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="ReceiveTab"
-        component={ReceiveScreen}
-        options={{
-          title: "Receive",
-          tabBarIcon: ({ color, size }) => (
-            <Feather name="bluetooth" size={size} color={color} />
-          ),
-        }}
-      />
+      {showSend ? (
+        <Tab.Screen
+          name="SendTab"
+          component={SendScreen}
+          options={{
+            title: "Send",
+            tabBarIcon: ({ color, size }) => (
+              <Feather name="edit-3" size={size} color={color} />
+            ),
+          }}
+        />
+      ) : null}
+      {showReceive ? (
+        <Tab.Screen
+          name="ReceiveTab"
+          component={ReceiveScreen}
+          options={{
+            title: "Receive",
+            tabBarIcon: ({ color, size }) => (
+              <Feather name="bluetooth" size={size} color={color} />
+            ),
+          }}
+        />
+      ) : null}
       <Tab.Screen
         name="HistoryTab"
         component={HistoryScreen}
