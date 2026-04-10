@@ -1,14 +1,29 @@
-import React from "react";
-import { StyleSheet, View, FlatList, Image } from "react-native";
+import React, { useState } from "react";
+import {
+  StyleSheet,
+  View,
+  FlatList,
+  Image,
+  Modal,
+  Pressable,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { Feather } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { CommonActions } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { ThemedText } from "@/components/ThemedText";
 import { GradientBackground } from "@/components/GradientBackground";
-import { BeachColors, Spacing, BorderRadius, Shadows } from "@/constants/theme";
+import { BeachColors, Spacing, BorderRadius, Shadows, Typography } from "@/constants/theme";
+import { ROLE_STORAGE_KEY } from "@/screens/OnboardingScreen";
+import { RootStackParamList } from "@/navigation/RootStackNavigator";
 import type { Message } from "@shared/schema";
+
+type NavProp = NativeStackNavigationProp<RootStackParamList>;
 
 function formatTimestamp(timestamp: Date | string): string {
   const date = new Date(timestamp);
@@ -88,9 +103,54 @@ function EmptyState() {
   );
 }
 
+interface ConfirmModalProps {
+  visible: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
+}
+
+function ConfirmModal({ visible, onConfirm, onCancel }: ConfirmModalProps) {
+  return (
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onCancel}
+    >
+      <Pressable style={styles.modalOverlay} onPress={onCancel}>
+        <Pressable style={styles.modalCard} onPress={() => {}}>
+          <Feather name="users" size={28} color={BeachColors.oceanBlue} style={styles.modalIcon} />
+          <ThemedText style={styles.modalTitle}>Switch User?</ThemedText>
+          <ThemedText style={styles.modalBody}>
+            You'll be taken back to the start to choose a different name. Your message history stays intact.
+          </ThemedText>
+          <View style={styles.modalButtons}>
+            <Pressable
+              testID="button-cancel-switch"
+              style={({ pressed }) => [styles.btnCancel, pressed && styles.btnPressed]}
+              onPress={onCancel}
+            >
+              <ThemedText style={styles.btnCancelText}>Stay</ThemedText>
+            </Pressable>
+            <Pressable
+              testID="button-confirm-switch"
+              style={({ pressed }) => [styles.btnConfirm, pressed && styles.btnPressed]}
+              onPress={onConfirm}
+            >
+              <ThemedText style={styles.btnConfirmText}>Switch</ThemedText>
+            </Pressable>
+          </View>
+        </Pressable>
+      </Pressable>
+    </Modal>
+  );
+}
+
 export default function HistoryScreen() {
   const insets = useSafeAreaInsets();
   const tabBarHeight = useBottomTabBarHeight();
+  const navigation = useNavigation<NavProp>();
+  const [showModal, setShowModal] = useState(false);
 
   const { data: messages = [], isLoading } = useQuery<Message[]>({
     queryKey: ["/api/messages"],
@@ -99,6 +159,27 @@ export default function HistoryScreen() {
 
   const deliveredCount = messages.filter((m) => m.delivered).length;
   const pendingCount = messages.filter((m) => !m.delivered).length;
+
+  const handleSwitchConfirm = async () => {
+    setShowModal(false);
+    await AsyncStorage.removeItem(ROLE_STORAGE_KEY);
+    navigation.dispatch(
+      CommonActions.reset({ index: 0, routes: [{ name: "Onboarding" }] })
+    );
+  };
+
+  const switchUserFooter = (
+    <View style={styles.switchContainer}>
+      <Pressable
+        testID="button-switch-user"
+        style={({ pressed }) => [styles.switchButton, pressed && styles.switchButtonPressed]}
+        onPress={() => setShowModal(true)}
+      >
+        <Feather name="users" size={14} color={BeachColors.textSecondary} />
+        <ThemedText style={styles.switchText}>Switch User</ThemedText>
+      </Pressable>
+    </View>
+  );
 
   return (
     <GradientBackground>
@@ -132,7 +213,14 @@ export default function HistoryScreen() {
             </View>
           ) : null
         }
+        ListFooterComponent={switchUserFooter}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
+      />
+
+      <ConfirmModal
+        visible={showModal}
+        onConfirm={handleSwitchConfirm}
+        onCancel={() => setShowModal(false)}
       />
     </GradientBackground>
   );
@@ -245,5 +333,90 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: BeachColors.textSecondary,
     textAlign: "center",
+  },
+  switchContainer: {
+    alignItems: "center",
+    paddingTop: Spacing["3xl"],
+    paddingBottom: Spacing.lg,
+  },
+  switchButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.xs,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.lg,
+    borderRadius: BorderRadius.full,
+    borderWidth: 1,
+    borderColor: "rgba(123, 138, 154, 0.3)",
+  },
+  switchButtonPressed: {
+    opacity: 0.6,
+  },
+  switchText: {
+    ...Typography.small,
+    color: BeachColors.textSecondary,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: Spacing["3xl"],
+  },
+  modalCard: {
+    backgroundColor: BeachColors.foamWhite,
+    borderRadius: BorderRadius.lg,
+    padding: Spacing["3xl"],
+    width: "100%",
+    alignItems: "center",
+    gap: Spacing.sm,
+    ...Shadows.floating,
+  },
+  modalIcon: {
+    marginBottom: Spacing.xs,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: BeachColors.textPrimary,
+  },
+  modalBody: {
+    ...Typography.small,
+    color: BeachColors.textSecondary,
+    textAlign: "center",
+    marginBottom: Spacing.lg,
+  },
+  modalButtons: {
+    flexDirection: "row",
+    gap: Spacing.md,
+    width: "100%",
+  },
+  btnCancel: {
+    flex: 1,
+    paddingVertical: Spacing.md,
+    borderRadius: BorderRadius.md,
+    borderWidth: 1,
+    borderColor: "rgba(123,138,154,0.3)",
+    alignItems: "center",
+  },
+  btnCancelText: {
+    ...Typography.body,
+    fontWeight: "600",
+    color: BeachColors.textSecondary,
+  },
+  btnConfirm: {
+    flex: 1,
+    paddingVertical: Spacing.md,
+    borderRadius: BorderRadius.md,
+    backgroundColor: BeachColors.oceanBlue,
+    alignItems: "center",
+  },
+  btnConfirmText: {
+    ...Typography.body,
+    fontWeight: "600",
+    color: BeachColors.foamWhite,
+  },
+  btnPressed: {
+    opacity: 0.75,
   },
 });
