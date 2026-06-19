@@ -26,12 +26,19 @@ This uses the existing `drizzle.config.ts` + `shared/schema.ts` to create the
 ### 3. Deploy the Worker
 
 ```bash
+npm install                             # from the REPO ROOT first — installs
+                                        # drizzle-orm + @neondatabase/serverless
 cd worker
 npm install
 npx wrangler login                      # opens browser, free Cloudflare account
 npx wrangler secret put DATABASE_URL    # paste the Neon connection string
 npx wrangler deploy
 ```
+
+> The Worker bundles `drizzle-orm` and `@neondatabase/serverless` from the
+> **root** `node_modules` (they're shared with the schema, so they live at the
+> root to avoid duplicate-copy issues). Always run `npm install` at the repo
+> root before deploying, not just inside `worker/`.
 
 Wrangler prints your URL, e.g. `https://sand-scribe-api.<your-subdomain>.workers.dev`.
 Test it: `curl https://sand-scribe-api.<your-subdomain>.workers.dev/api/messages`
