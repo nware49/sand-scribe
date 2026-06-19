@@ -265,7 +265,7 @@ export default function ReceiveScreen() {
           <View style={[styles.noticeContainer, { bottom: tabBarHeight + Spacing.lg }]}>
             <Feather name="info" size={14} color={BeachColors.textSecondary} />
             <ThemedText style={styles.noticeText}>
-              BLE requires Expo Go on a physical device
+              BLE requires a development build on a physical device
             </ThemedText>
           </View>
         ) : null}
