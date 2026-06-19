@@ -12,8 +12,7 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.sandscribe.app",
       "infoPlist": {
-        "NSBluetoothAlwaysUsageDescription": "Sand Scribe needs Bluetooth to connect to the display device and send messages.",
-        "NSBluetoothPeripheralUsageDescription": "Sand Scribe needs Bluetooth to connect to the display device and send messages."
+        "NSBluetoothAlwaysUsageDescription": "Sand Scribe needs Bluetooth to connect to the display device and send messages."
       }
     },
     "android": {
@@ -48,7 +47,16 @@
           "backgroundColor": "#F5E6D3"
         }
       ],
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "react-native-ble-plx",
+        {
+          "isBackgroundEnabled": false,
+          "neverForLocation": true,
+          "modes": ["central"],
+          "bluetoothAlwaysPermission": "Sand Scribe needs Bluetooth to connect to the display device and send messages."
+        }
+      ]
     ],
     "experiments": {
       "reactCompiler": true
