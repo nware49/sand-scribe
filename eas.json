@@ -9,18 +9,27 @@
       "distribution": "internal",
       "ios": {
         "simulator": false
+      },
+      "env": {
+        "EXPO_PUBLIC_DOMAIN": "sand-scribe-api.YOUR-SUBDOMAIN.workers.dev"
       }
     },
     "preview": {
       "distribution": "internal",
       "ios": {
         "simulator": false
+      },
+      "env": {
+        "EXPO_PUBLIC_DOMAIN": "sand-scribe-api.YOUR-SUBDOMAIN.workers.dev"
       }
     },
     "production": {
       "autoIncrement": true,
       "ios": {
         "buildConfiguration": "Release"
+      },
+      "env": {
+        "EXPO_PUBLIC_DOMAIN": "sand-scribe-api.YOUR-SUBDOMAIN.workers.dev"
       }
     }
   },

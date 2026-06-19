@@ -1,0 +1,44 @@
+name: Backup messages
+
+# Nightly export of all messages from Neon into a private backup repo,
+# stored as both JSON (machine backup) and Markdown (readable archive).
+
+on:
+  schedule:
+    - cron: "0 7 * * *" # daily at 07:00 UTC
+  workflow_dispatch: {} # allow manual runs from the Actions tab
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout app repo
+        uses: actions/checkout@v4
+
+      - name: Checkout private backup repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ vars.BACKUP_REPO }}
+          token: ${{ secrets.BACKUP_TOKEN }}
+          path: backup-repo
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Export messages from Neon
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          npm install --no-save @neondatabase/serverless@^0.10.4
+          node scripts/backup-messages.mjs
+
+      - name: Commit backup to private repo
+        run: |
+          cp backup/messages.json backup/messages.md backup-repo/
+          cd backup-repo
+          git config user.name "sand-scribe-backup"
+          git config user.email "actions@users.noreply.github.com"
+          git add messages.json messages.md
+          git diff --staged --quiet || git commit -m "Backup $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push

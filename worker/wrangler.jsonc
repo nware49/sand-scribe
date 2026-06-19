@@ -1,0 +1,15 @@
+{
+  // Cloudflare Worker config for the Sand Scribe API.
+  // Deploy with: npx wrangler deploy
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "sand-scribe-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2024-11-12",
+  // Needed by @neondatabase/serverless on the Workers runtime.
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": true
+  }
+  // DATABASE_URL is a secret, not committed here. Set it once with:
+  //   npx wrangler secret put DATABASE_URL
+}
