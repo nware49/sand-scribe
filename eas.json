@@ -11,7 +11,7 @@
         "simulator": false
       },
       "env": {
-        "EXPO_PUBLIC_DOMAIN": "sand-scribe-api.YOUR-SUBDOMAIN.workers.dev"
+        "EXPO_PUBLIC_DOMAIN": "sand-scribe-api.sand-scribe.workers.dev"
       }
     },
     "preview": {
@@ -20,7 +20,7 @@
         "simulator": false
       },
       "env": {
-        "EXPO_PUBLIC_DOMAIN": "sand-scribe-api.YOUR-SUBDOMAIN.workers.dev"
+        "EXPO_PUBLIC_DOMAIN": "sand-scribe-api.sand-scribe.workers.dev"
       }
     },
     "production": {
@@ -29,7 +29,7 @@
         "buildConfiguration": "Release"
       },
       "env": {
-        "EXPO_PUBLIC_DOMAIN": "sand-scribe-api.YOUR-SUBDOMAIN.workers.dev"
+        "EXPO_PUBLIC_DOMAIN": "sand-scribe-api.sand-scribe.workers.dev"
       }
     }
   },
